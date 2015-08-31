@@ -1,10 +1,10 @@
 package cakesolutions.menu
 
 import com.typesafe.config.Config
+import scala.collection.JavaConversions._
+import scala.util.{Failure, Success, Try}
 
-import scala.util.{Success, Failure, Try}
-
-class ValidatedLoad {
+trait ValidatedLoad {
 
   private[this] def loadItem(item: Config): Try[Item] = {
     if (! item.hasPath("name") || ! item.hasPath("price")) {
@@ -25,14 +25,18 @@ class ValidatedLoad {
    */
   def load(config: Config): Try[Order] = {
     if (! config.hasPath("menu.items")) {
-      return Failure(new Exception("Misconfiguration detected - could not locate path menu.items"))
+      return Failure(new Exception("Misconfiguration detected - could not locate path `menu.items`"))
     }
 
     val items = config.getConfigList("menu.items")
 
-    val validatedItems = for (item <- items) yield loadItem(item)
+    items.foldRight[Try[Order]](Success(Order(Vector.empty))) {
+      case (_, err: Failure[Order]) =>
+        err
 
-    Success(Order(validatedItems))
+      case (item, Success(Order(order))) =>
+        for (newItem <- loadItem(item)) yield Order(newItem +: order)
+    }
   }
 
 }

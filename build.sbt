@@ -36,6 +36,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-contrib" % "2.4.0-RC1",
   "com.typesafe.akka" %% "akka-http-core-experimental" % "1.0",
   "com.typesafe.akka" %% "akka-http-experimental" % "1.0",
+  "com.typesafe.akka" %% "akka-http-spray-json-experimental" % "1.0",
   "com.typesafe.akka" %% "akka-slf4j" % "2.4.0-RC1",
   // Miscellaneous
   "ch.qos.logback" %  "logback-classic" % "1.1.3",

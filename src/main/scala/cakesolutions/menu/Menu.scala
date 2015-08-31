@@ -1,7 +1,7 @@
 package cakesolutions.menu
 
-case class Item(description: String, price: Double) {
-  require(description.nonEmpty)
+case class Item(name: String, price: Double) {
+  require(name.nonEmpty)
   require(price > 0)
 }
 
