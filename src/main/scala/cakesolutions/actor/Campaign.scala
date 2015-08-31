@@ -31,21 +31,13 @@ class Campaign extends LoggingActor with ValidatedLoad {
       sender() ! Order(orders)
 
     case ViewOrder(tag) =>
-      sender() ! Order(orders.filter(_.tag.exists(tag ==)))
+      ???
 
     case AddToOrder(order @ OrderItem(name), tag) =>
-      val price = menu.items.find(_.name == name).map(_.price)
-
-      if (price.isDefined) {
-        price.foreach(cost => orders = Item(name, cost, Some(tag)) +: orders)
-
-        sender() ! s"Added $order to order for $tag"
-      } else {
-        sender() ! s"Failed to add $order - no menu item is named $name"
-      }
+      ???
 
     case DeleteFromOrder(OrderItem(name), tag) =>
-      orders = orders.filterNot(order => order.name == name && order.tag.exists(tag ==))
+      ???
   }
 
 }

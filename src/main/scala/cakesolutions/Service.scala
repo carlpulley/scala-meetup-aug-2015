@@ -73,14 +73,14 @@ trait Service extends ValidatedLoad {
         pathEnd {
           get {
             complete {
-              (processor(id) ? ViewOrder(tag)).mapTo[Order]
+              ???
             }
           }
         } ~
         path("delete") {
           post {
             entity(as[OrderItem]) { order =>
-              processor(id) ! DeleteFromOrder(order, tag)
+              ???
 
               complete(s"Removed $order from existing order")
             }
@@ -90,7 +90,7 @@ trait Service extends ValidatedLoad {
           post {
             entity(as[OrderItem]) { order =>
               complete {
-                (processor(id) ? AddToOrder(order, tag)).mapTo[String]
+                ???
               }
             }
           }
