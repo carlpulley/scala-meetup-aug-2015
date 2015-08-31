@@ -1,22 +1,19 @@
 package cakesolutions
 
-import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.actor.{ActorRef, ActorSystem}
 import akka.event.LoggingAdapter
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, RejectionHandler, Route, ValidationRejection}
-import akka.pattern.ask
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import cakesolutions.actor.Campaign
-import cakesolutions.menu.{Order, OrderItem, ValidatedLoad}
+import cakesolutions.menu.ValidatedLoad
 import com.typesafe.config.Config
 import java.util.UUID
 import scala.concurrent.Future
 
 trait Service extends ValidatedLoad {
 
-  import Campaign._
   import Protocols._
   import StatusCodes._
 
@@ -39,15 +36,14 @@ trait Service extends ValidatedLoad {
           pathEnd {
             get {
               complete {
-                (processor(id) ? ViewCampaign).mapTo[Order]
+                ???
               }
             }
           } ~
           path("complete") {
             post {
               complete {
-                system.stop(processor(id))
-                processor -= id
+                ???
 
                 "Please pick up your order"
               }
@@ -59,40 +55,9 @@ trait Service extends ValidatedLoad {
         post {
           complete {
             val id = UUID.randomUUID()
-            processor += id -> system.actorOf(Props[Campaign])
+            ???
 
             id.toString
-          }
-        }
-      }
-    }
-
-  private[this] def order(implicit materializer: ActorMaterializer, timeout: Timeout): Route =
-    pathPrefix("order" / JavaUUID / Segment) { (id, tag) =>
-      validate(processor.contains(id), s"$id is an invalid campaign identifier") {
-        pathEnd {
-          get {
-            complete {
-              (processor(id) ? ViewOrder(tag)).mapTo[Order]
-            }
-          }
-        } ~
-        path("delete") {
-          post {
-            entity(as[OrderItem]) { order =>
-              processor(id) ! DeleteFromOrder(order, tag)
-
-              complete(s"Removed $order from existing order")
-            }
-          }
-        } ~
-        pathEnd {
-          post {
-            entity(as[OrderItem]) { order =>
-              complete {
-                (processor(id) ? AddToOrder(order, tag)).mapTo[String]
-              }
-            }
           }
         }
       }
@@ -122,7 +87,7 @@ trait Service extends ValidatedLoad {
       logResult("HTTPResponse") {
         handleExceptions(exceptionHandler(system.log)) {
           handleRejections(rejectionHandler(system.log)) {
-            menu(system.settings.config) ~ campaign ~ order
+            menu(system.settings.config) ~ campaign
           }
         }
       }
