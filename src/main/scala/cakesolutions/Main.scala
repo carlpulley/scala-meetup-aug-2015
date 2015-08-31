@@ -3,6 +3,9 @@ package cakesolutions
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
+import akka.util.Timeout
+import java.util.concurrent.TimeUnit
+import scala.concurrent.duration._
 
 object Main extends App with Service {
 
@@ -12,9 +15,12 @@ object Main extends App with Service {
   val config = system.settings.config
   val hostname = config.getString("hostname")
   val port = config.getInt("port")
+  val log = system.log
 
-  system.log.info("We started!")
+  implicit val timeout = Timeout(config.getDuration("timeout", TimeUnit.SECONDS).seconds)
 
-  val bindingFuture = Http().bindAndHandle(route(config), hostname, port)
+  log.info("We started!")
+
+  val bindingFuture = Http().bindAndHandle(route, hostname, port)
 
 }
